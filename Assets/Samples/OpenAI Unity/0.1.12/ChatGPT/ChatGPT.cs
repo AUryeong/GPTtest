@@ -20,27 +20,32 @@ namespace OpenAI
         public NpcSetting npc;
         public TextAsset asset;
 
-        private float height;
-        private OpenAIApi openai = new OpenAIApi();
+        public bool isAssetLoading = false;
 
-        private List<ChatMessage> messages = new List<ChatMessage>();
+        private float height;
+        private OpenAIApi openai = new OpenAIApi("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");
+
+        private List<ChatMessage> messages = new();
 
         private void Start()
         {
             audioSource = GetComponent<AudioSource>();
-            // string[] lines = asset.text.Split('\n');
-            // npc.prompt.Clear();
-            // npc.examples.Clear();
-            // for (int i = 1; i < lines.Length; i++)
-            // {
-            //     string[] colummn = lines[i].Split('\t');
-            //     npc.prompt.Add(colummn[0]);
-            //     npc.examples.Add(new NpcExample()
-            //     {
-            //         question = colummn[1],
-            //         answer = colummn[2]
-            //     });
-            // }
+            if (isAssetLoading)
+            {
+                string[] lines = asset.text.Split('\n');
+                npc.prompt.Clear();
+                npc.examples.Clear();
+                for (int i = 1; i < lines.Length; i++)
+                {
+                    string[] colummn = lines[i].Split('\t');
+                    npc.prompt.Add(colummn[0]);
+                    npc.examples.Add(new NpcExample()
+                    {
+                        question = colummn[1],
+                        answer = colummn[2]
+                    });
+                }
+            }
             foreach (var prom in npc.prompt)
             {
                 messages.Add(new ChatMessage()
@@ -65,6 +70,12 @@ namespace OpenAI
             }
             
             button.onClick.AddListener(SendReply);
+        }
+
+        private void Update()
+        {
+            if(Input.GetKeyDown(KeyCode.Return))
+                SendReply();
         }
 
         private void AppendMessage(ChatMessage message)
@@ -109,7 +120,7 @@ namespace OpenAI
             // Complete the instruction
             var completionResponse = await openai.CreateChatCompletion(new CreateChatCompletionRequest()
             {
-                Model = "gpt-3.5-turbo-0301",
+                Model = "gpt-3.5-turbo-16k",
                 Messages = messages,
             });
 
