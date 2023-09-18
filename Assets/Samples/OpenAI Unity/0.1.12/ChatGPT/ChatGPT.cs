@@ -3,6 +3,9 @@ using UnityEngine;
 using UnityEngine.UI;
 using System.Collections.Generic;
 using ScrtipableObjects;
+using System.Net.Http;
+using System.Diagnostics;
+using System;
 
 namespace OpenAI
 {
@@ -70,6 +73,24 @@ namespace OpenAI
             }
             
             button.onClick.AddListener(SendReply);
+
+            //try
+            //{
+            //    Process psi = new Process();
+            //    psi.StartInfo.FileName = "C:\\Users\\Lenovo\\AppData\\Local\\Microsoft\\WindowsApps\\python.exe";
+            //    시작할 어플리케이션 또는 문서
+            //    psi.StartInfo.Arguments = Application.dataPath + "/MoeGoe/MoeGoe.py";
+            //    애플 시작시 사용할 인수
+            //    psi.StartInfo.CreateNoWindow = true;
+            //    새창 안띄울지
+            //    psi.StartInfo.UseShellExecute = false;
+            //    프로세스를 시작할때 운영체제 셸을 사용할지
+            //    psi.Start();
+            //}
+            //catch (Exception e)
+            //{
+            //    UnityEngine.Debug.LogError("Unable to launch app: " + e.Message);
+            //}
         }
 
         private void Update()
@@ -78,7 +99,7 @@ namespace OpenAI
                 SendReply();
         }
 
-        private void AppendMessage(ChatMessage message)
+        private async void AppendMessage(ChatMessage message)
         {
             scroll.content.SetSizeWithCurrentAnchors(RectTransform.Axis.Vertical, 0);
 
@@ -89,15 +110,20 @@ namespace OpenAI
             height += item.sizeDelta.y;
             scroll.content.SetSizeWithCurrentAnchors(RectTransform.Axis.Vertical, height);
             scroll.verticalNormalizedPosition = 0;
+
+            using var client = new HttpClient();
+            string url = "http://127.0.0.1:5000/お疲れ?でした。";
+            var response = await client.GetAsync(url);
+            var content = await response.Content.ReadAsStringAsync();
+
+            StartCoroutine(DownloadTheAudio());
         }
 
-        IEnumerator DownloadTheAudio(string text)
+        IEnumerator DownloadTheAudio()
         {
-            string url = $"http://translate.google.com/translate_tts?ie=UTF-8&total=1&idx=0&textlen=32&client=tw-ob&q={text}&tl=ko-kr";
-            WWW www = new WWW(url);
+            WWW www = new("file://" + Application.dataPath + "/MoeGoe/output/output.wav");
             yield return www;
-
-            audioSource.clip = www.GetAudioClip(false,true, AudioType.MPEG);
+            AudioClip audioClip = www.GetAudioClip();
             audioSource.Play();
         }
 
@@ -130,12 +156,11 @@ namespace OpenAI
                 message.Content = message.Content.Trim();
                 
                 messages.Add(message);
-                StartCoroutine(DownloadTheAudio(message.Content));
                 AppendMessage(message);
             }
             else
             {
-                Debug.LogWarning("No text was generated from this prompt.");
+                UnityEngine.Debug.LogWarning("No text was generated from this prompt.");
             }
             
             button.enabled = true;
