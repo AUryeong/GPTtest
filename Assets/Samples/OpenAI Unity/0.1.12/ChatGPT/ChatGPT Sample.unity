@@ -685,9 +685,10 @@ MonoBehaviour:
   scroll: {fileID: 356682880}
   sent: {fileID: 8660877164928630359, guid: 53cd26a6eefa5a74086203cd118a04d3, type: 3}
   received: {fileID: 961534450149497043, guid: adc0146c2853ed1418133faaf4379eb1, type: 3}
-  npc: {fileID: 11400000, guid: 023ba767689cf4842a2c12b24025515d, type: 2}
+  npc: {fileID: 11400000, guid: 22400125fcb6e16439c635148d68f454, type: 2}
   asset: {fileID: 4900000, guid: c5fdda2b46c7e0144b079816ca3db8f5, type: 3}
-  isAssetLoading: 1
+  isAssetLoading: 0
+  language: KO
 --- !u!4 &499436300
 Transform:
   m_ObjectHideFlags: 0
@@ -716,7 +717,7 @@ AudioSource:
   m_audioClip: {fileID: 0}
   m_PlayOnAwake: 1
   m_Volume: 1
-  m_Pitch: 1.5
+  m_Pitch: 1
   Loop: 0
   Mute: 0
   Spatialize: 0
